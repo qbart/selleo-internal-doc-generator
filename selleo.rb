@@ -1,5 +1,6 @@
 #!/bin/ruby
 
+require 'tmpdir'
 require 'date'
 
 class XDate < Date
