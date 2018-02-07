@@ -1,6 +1,5 @@
 #!/bin/ruby
 
-require 'pry'
 require 'date'
 
 class XDate < Date
