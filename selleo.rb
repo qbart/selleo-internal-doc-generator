@@ -51,7 +51,7 @@ end
 class Pdf
   def initialize(template)
     @pwd      = Dir.pwd
-    @template = File.join(@pwd, template)
+    @template = template
   end
 
   def generate(params)
@@ -61,15 +61,10 @@ class Pdf
       "{{END_DATE}}"   => params.end_date.to_s,
       "{{LIST}}"       => params.todos.gsub("\n", "<br>").gsub(" ", "&nbsp;")
     }
-    file_name = "#{params.begin_date.to_s.gsub("-", "")}-#{params.end_date.to_s.gsub("-", "")}.pdf"
 
     Dir.mktmpdir do |dir|
-      unzip = "unzip \"#{File.join(@template)}\" -d #{dir}"
-
-      puts "Running: #{unzip}"
-      system unzip
-
-      html_file = Dir[File.join(dir, "*.html")].first
+      FileUtils.cp(File.join(@pwd, @template), dir)
+      html_file = File.join(dir, @template)
       puts "Replacing params tmp file: #{html_file}"
       data = File.read(html_file)
       replacements.each do |key, value|
@@ -79,12 +74,17 @@ class Pdf
         f.write(data)
       end
 
-      puts "Copying pdf"
-      out_dir = File.join(@pwd, "pdf")
+      out_dir  = File.join(@pwd, "pdf")
+      out_file = File.join(dir, "out.pdf")
       FileUtils.mkdir_p(out_dir)
-      pdf = "wkhtmltopdf \"#{html_file}\" \"#{File.join(dir, "out.pdf")}\""
+      pdf = "wkhtmltopdf \"#{html_file}\" \"#{out_file}\""
+      puts "Running wkhtmltopdf: #{pdf}"
       system pdf
-      FileUtils.cp(File.join(dir, "out.pdf"), File.join(out_dir, file_name))
+
+      puts "Copying generated PDF"
+      file_name = "#{params.begin_date.to_s.gsub("-", "")}-#{params.end_date.to_s.gsub("-", "")}.pdf"
+      FileUtils.cp(out_file, File.join(out_dir, file_name))
+      puts "Done"
     end
   end
 end
@@ -125,7 +125,7 @@ if params.valid?
   puts "Prompt:\n"
   params.todos = StdinReader.new.gets
   puts "Generating PDF with:\n#{params}"
-  pdf = Pdf.new("protokol.zip")
+  pdf = Pdf.new("protokol.html")
   pdf.generate(params)
 else
   puts "Not enough params to generate PDF"
