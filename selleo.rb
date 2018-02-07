@@ -77,7 +77,7 @@ class Pdf
       out_dir  = File.join(@pwd, "pdf")
       out_file = File.join(dir, "out.pdf")
       FileUtils.mkdir_p(out_dir)
-      pdf = "wkhtmltopdf \"#{html_file}\" \"#{out_file}\""
+      pdf = "wkhtmltopdf --page-size A4 \"#{html_file}\" \"#{out_file}\""
       puts "Running wkhtmltopdf: #{pdf}"
       system pdf
 
