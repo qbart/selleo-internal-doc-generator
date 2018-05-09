@@ -2,7 +2,7 @@
 
 ## Deps
 
-1. `wkthmltopdf` binary in your `PATH`
+1. `wkhtmltopdf` binary in your `PATH`
 2. `ruby >= 2.3.1`
 
 ## Prepartion
